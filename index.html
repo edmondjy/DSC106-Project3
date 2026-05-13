@@ -30,7 +30,7 @@
       flex-direction: column;
     }
 
-    /* ── Header ── */
+    /* Header ───────────────────────── */
     header {
       padding: 1.5rem 2.5rem 1rem;
       border-bottom: 1px solid var(--border);
@@ -71,7 +71,7 @@
       gap: 1.5rem;
     }
 
-    /* ── Chart area ── */
+    /*  Chart area ───────────────────────── */
     .chart-wrap {
       background: var(--panel);
       border: 1px solid var(--border);
@@ -95,7 +95,7 @@
     }
     #chart-container svg { width: 100%; height: 100%; display: block; }
 
-    /* ── Tooltip ── */
+    /*  Tooltip ───────────────────────── */
     #tooltip {
       position: fixed;
       background: rgba(10,14,26,0.95);
@@ -114,7 +114,7 @@
     #tooltip .tt-val { color: var(--accent2); font-weight: 700; }
     #tooltip .tt-na  { color: var(--muted); }
 
-    /* ── Side panel ── */
+    /*  Side panel ───────────────────────── */
     .side-panel {
       display: flex;
       flex-direction: column;
@@ -136,7 +136,7 @@
       margin-bottom: 0.8rem;
     }
 
-    /* ── Time slider ── */
+    /* Time slider ───────────────────────── */
     .time-display {
       font-family: var(--font-mono);
       font-size: 1.6rem;
@@ -360,10 +360,7 @@
 
   <h2>Design Rationale</h2>
   <p>
-    We chose a <strong>heatmap</strong> as the primary encoding because SST is a continuous spatial variable — color is the most expressive channel for communicating 2D temperature fields. The <strong>inferno colormap</strong> (dark purple → orange → yellow) was selected because it is perceptually uniform, colorblind-accessible, and intuitively conveys heat.
-  </p>
-  <p>
-    The <strong>time slider</strong> was chosen as the primary interaction technique because it directly maps to the temporal dimension of the dataset, allowing viewers to scrub through hourly frames and observe how SST patterns shift. Tooltips provide <strong>details-on-demand</strong>: hovering reveals exact pixel-level temperatures without cluttering the main view. The side panel displays per-frame statistics (mean, min, max) so readers can compare frames quantitatively rather than visually alone.
+    We chose a <strong>heatmap</strong> as the primary encoding because SST is a continuous spatial variable, color is the most expressive channel for communicating 2D temperature fields. The <strong>inferno colormap</strong> (purple, orange, yellow) was selected because it is colorblind accessible and intuitively conveys heat.
   </p>
   <p>
     We considered using animation (auto-play) but preferred a slider to give users full control over pacing and comparison. We also considered a line chart of mean SST over time as an alternative, but the spatial heatmap reveals Gulf Stream boundary structure that a line chart cannot convey.
@@ -376,27 +373,27 @@
 
   <h2>Development Process</h2>
   <p>
-    <strong>Edmond Yang</strong> — writeup, reflection, and page structure.<br>
-    <strong>Marvell Suhali</strong> — exploratory analysis and static visualizations (mean SST heatmap, min/max time series, SST spatial average).<br>
-    <strong>Liuxuhong Zhao</strong> — data pipeline (Python/xarray), JSON export, D3.js interactive visualization, GitHub Pages deployment.
+    <strong>Edmond Yang</strong> — Writeup, Reflection, and Page Structure.<br>
+    <strong>Marvell Suhali</strong> — Exploratory Analysis and Static Visualizations (mean SST heatmap, min/max time series, SST spatial average).<br>
+    <strong>Liuxuhong Zhao</strong> — Data Pipeline (Python/xarray), JSON export, D3.js Interactive Visualization.
   </p>
   <p>
-    Total estimated effort: ~12 people-hours. The most time-consuming aspect was setting up the GOES data access pipeline and resolving xarray/h5py dependency issues in the Python environment. Implementing the D3 heatmap required careful handling of the irregular grid coordinates and NaN masking.
+    Total estimated effort: ~12 hours. The most time consuming aspect was setting up the GOES data access pipeline and resolving xarray/h5py dependency issues in the Python environment. Formatting the website also took some trial and error to achieve the wanted layout and styling.
   </p>
 </div>
 
 <script>
-// ── Time labels for 6 hourly frames ──────────────────────────────────────────
+// Time labels for 6 hourly frames 
 const timeLabels = ['00:00','01:00','02:00','03:00','04:00','05:00'];
 
-// ── Color scale: inferno (285K–302K) ─────────────────────────────────────────
+// Color scale: inferno (285K–302K) 
 const colorScale = d3.scaleSequential(d3.interpolateInferno).domain([285, 302]);
 
-// ── State ─────────────────────────────────────────────────────────────────────
+// State 
 let allData = null;
 let currentStep = 0;
 
-// ── Load data ─────────────────────────────────────────────────────────────────
+// Load data ─────────────────────────
 d3.json('sst_data.json').then(data => {
   allData = data;
   document.getElementById('loading').style.display = 'none';
@@ -407,7 +404,7 @@ d3.json('sst_data.json').then(data => {
     `<p style="color:#ef4444">Error loading data: ${err.message}</p>`;
 });
 
-// ── Draw legend ───────────────────────────────────────────────────────────────
+// Draw legend ─────────────────────────
 function buildLegend() {
   const svg = d3.select('#legend-svg');
   const W = document.getElementById('legend-svg').getBoundingClientRect().width || 220;
@@ -424,13 +421,13 @@ function buildLegend() {
     .attr('rx',3).style('fill','url(#leg-grad)');
 }
 
-// ── Draw one frame ────────────────────────────────────────────────────────────
+// Draw one frame ─────────────────────────
 function drawFrame(step) {
   currentStep = step;
   const frame = allData[step];
   const xs = frame.x;
   const ys = frame.y;
-  const sst = frame.sst; // 2D array [y_idx][x_idx]
+  const sst = frame.sst; 
 
   const container = document.getElementById('chart-container');
   const W = container.clientWidth;
@@ -494,7 +491,7 @@ function drawFrame(step) {
   document.getElementById('time-slider').value = step;
 }
 
-// ── Controls ──────────────────────────────────────────────────────────────────
+// Controls ─────────────────────────
 document.getElementById('time-slider').addEventListener('input', function() {
   if (!allData) return;
   drawFrame(+this.value);
